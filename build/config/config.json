@@ -1,0 +1,18 @@
+{
+  "CONTRACT_ADDRESS": "0xf5Eb29D00d6c4b5Da84e93b3173fA6de9685a199",
+  "SCAN_LINK": "https://polygonscan.com/address/0xf5Eb29D00d6c4b5Da84e93b3173fA6de9685a199",
+  "NETWORK": {
+    "NAME": "Polygon Mainnet",
+    "SYMBOL": "MATIC",
+    "ID": 137
+  },
+  "NFT_NAME": "MetaBadges",
+  "SYMBOL": "OSIS",
+  "MAX_SUPPLY": 10000,
+  "WEI_COST": 75000000000000000,
+  "DISPLAY_COST": 900,
+  "GAS_LIMIT": 285000,
+  "MARKETPLACE": "Opeansea",
+  "MARKETPLACE_LINK": "https://opensea.io/MetaBadge",
+  "SHOW_BACKGROUND": true
+}
