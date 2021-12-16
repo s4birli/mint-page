@@ -3,7 +3,8 @@ import Web3EthContract from "web3-eth-contract";
 import Web3 from "web3";
 // log
 import { fetchData } from "../data/dataActions";
-
+import MainConfig from '../../assets/config.json';
+import ABIJSON from '../../assets/abi.json';
 const connectRequest = () => {
   return {
     type: "CONNECTION_REQUEST",
@@ -40,27 +41,27 @@ const updateAccountRequest = (payload) => {
 
 export const contract = () => {
   return async (dispatch) => {
-    const abiResponse = await fetch("/config/abi.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const abi = await abiResponse.json();
-    const configResponse = await fetch("/config/config.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const CONFIG = await configResponse.json();
+    // const abiResponse = await fetch("/config/abi.json", {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/json",
+    //   },
+    // });
+    const abi = ABIJSON;
+    // const configResponse = await fetch("/config/config.json", {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/json",
+    //   },
+    // });
+    // const CONFIG = await configResponse.json();
     const { ethereum } = window;
 
     Web3EthContract.setProvider(ethereum);
     let web3 = new Web3(ethereum);
     const SmartContractObj = new Web3EthContract(
       abi,
-      CONFIG.CONTRACT_ADDRESS
+      MainConfig.CONTRACT_ADDRESS
     );
 
     dispatch(
@@ -75,20 +76,15 @@ export const contract = () => {
 export const connect = () => {
   return async (dispatch) => {
     dispatch(connectRequest());
-    const abiResponse = await fetch("/config/abi.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const abi = await abiResponse.json();
-    const configResponse = await fetch("/config/config.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const CONFIG = await configResponse.json();
+    
+    const abi = ABIJSON;
+    // const configResponse = await fetch("/config/config.json", {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/json",
+    //   },
+    // });
+    // const CONFIG = await configResponse.json();
     const { ethereum } = window;
     const metamaskIsInstalled = ethereum && ethereum.isMetaMask;
     if (metamaskIsInstalled) {
@@ -101,10 +97,10 @@ export const connect = () => {
         const networkId = await ethereum.request({
           method: "net_version",
         });
-        if (networkId == CONFIG.NETWORK.ID) {
+        if (networkId == MainConfig.NETWORK.ID) {
           const SmartContractObj = new Web3EthContract(
             abi,
-            CONFIG.CONTRACT_ADDRESS
+            MainConfig.CONTRACT_ADDRESS
           );
           let tier1, tier2 = false
           let tier1Price, tier2Price, whitelistPrice  = 0

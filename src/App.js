@@ -4,6 +4,7 @@ import { connect, contract } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
 import styled from "styled-components";
+import MainConfig from './assets/config.json';
 
 const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
@@ -204,8 +205,10 @@ function App() {
         cost = await blockchain.smartContract.methods
           .getWhitelistPrice()
           .call();
+        console.log('WhitelistPrice', cost)
       } else {
         cost = await blockchain.smartContract.methods.getTier1Price().call();
+        console.log('WhitelistPrice', cost)
       }
     } else if (tier === 2) {
       if (
@@ -264,7 +267,7 @@ function App() {
           .then((receipt) => {
             console.log(receipt);
             setFeedback(
-              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it 🚀`
+              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to <a href="https://opensea.io/" target="_black">OpenSea.io</a> to view it 🚀`
             );
             setClaimingNft1(false);
             dispatch(fetchData(blockchain.account));
@@ -304,7 +307,7 @@ function App() {
           .then((receipt) => {
             console.log(receipt);
             setFeedback(
-              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it 🚀`
+              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to <a href="https://opensea.io/" target="_black">OpenSea.io</a> to view it 🚀`
             );
             setClaimingNft2(false);
             dispatch(fetchData(blockchain.account));
@@ -360,14 +363,14 @@ function App() {
   };
 
   const getConfig = async () => {
-    const configResponse = await fetch("/config/config.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    const config = await configResponse.json();
-    SET_CONFIG(config);
+    // const configResponse = await fetch("/config/config.json", {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Accept: "application/json",
+    //   },
+    // });
+    // const config = await configResponse.json();
+    SET_CONFIG(MainConfig);
   };
 
   const numberWithCommas = (x) => {
@@ -526,8 +529,9 @@ function App() {
                         marginTop: "10px",
                         textAlign: "center",
                       }}
+                      dangerouslySetInnerHTML={{__html: feedback}}
                     >
-                      {feedback}
+                      {/* {feedback} */}
                     </s.TextDescription>
                     <s.SpacerMedium />
 
