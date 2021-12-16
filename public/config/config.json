@@ -6,7 +6,7 @@
     "SYMBOL": "MATIC",
     "ID": 80001
   },
-  "NFT_NAME": "MetaBadges",
+  "NFT_NAME": "MetaBadge",
   "SYMBOL": "OSIS",
   "MAX_SUPPLY": 10000,
   "WEI_COST": 75000000000000000,
