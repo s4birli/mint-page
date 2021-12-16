@@ -70,7 +70,7 @@ export const ResponsiveWrapper = styled.div`
 
 export const StyledLogo = styled.img`
   @media (min-width: 767px) {
-    width: 71px;
+    width: 85px;
     position: absolute;
     float: left;
     margin-left: 20px;
@@ -90,7 +90,7 @@ export const StyledLogo = styled.img`
 export const StyledLogoHeader = styled.img`
   width: 200px;
   @media (min-width: 767px) {
-    width: 300px;
+    width: 30%;
     margin-left: -20px;
     margin-top: 15px;
   }
@@ -154,7 +154,7 @@ export const MainContainer = styled.div`
   min-height: 400px;
 
   @media (min-width: 767px) {
-    flex: 0 0 50%;
+    flex: 0 0 65%;
     height: 400px;    
   }
 
