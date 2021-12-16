@@ -48,6 +48,11 @@ export const Container = styled.div`
   background-image: ${({ image }) => (image ? `url(${image})` : "none")};
   background-size: cover;
   background-position: center;
+  @media (min-width: 767px) {
+  }
+  @media (max-width: 767px) {
+    flex-direction: ${({ mfd, fd }) => (mfd ? mfd : fd ? fd : 'column')}
+  }
 `;
 
 export const TextTitle = styled.p`

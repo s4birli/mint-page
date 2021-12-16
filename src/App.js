@@ -9,7 +9,6 @@ const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
 
 export const StyledButton = styled.button`
-  padding: 10px;
   border: none;
   background-color: var(--button);
   padding: 10px;
@@ -17,11 +16,20 @@ export const StyledButton = styled.button`
   color: var(--secondary-text);
   width: 100px;
   cursor: pointer;
-  margin-right: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
   :active {
     box-shadow: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
+  }
+  &:disabled {
+    background-color: var(--button-disable);
+  }
+  @media (min-width: 767px) {
+  }
+  @media (max-width: 767px) {
+    margin-top: ${({ mmt }) => (mmt ? mmt : "unset")};
   }
 `;
 
@@ -57,15 +65,42 @@ export const ResponsiveWrapper = styled.div`
   justify-content: stretched;
   align-items: stretched;
   width: 100%;
-  @media (min-width: 767px) {
-    flex-direction: row;
-  }
+  flex-direction: row;
 `;
 
 export const StyledLogo = styled.img`
+  @media (min-width: 767px) {
+    width: 71px;
+    position: absolute;
+    float: left;
+    margin-left: 20px;
+  }
+  @media (max-width: 767px) {
+    width: 45px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  transition: width 0.5s;
+  transition: height 0.5s;
+  display: block;
+`;
+
+export const StyledLogoHeader = styled.img`
   width: 200px;
   @media (min-width: 767px) {
     width: 300px;
+    margin-left: -20px;
+    margin-top: 15px;
+  }
+  @media (max-width: 767px) {
+    width: 100%;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+    margin-top: 2rem;
   }
   transition: width 0.5s;
   transition: height 0.5s;
@@ -91,13 +126,51 @@ export const StyledLink = styled.a`
   text-decoration: none;
 `;
 
+export const ContainerHeader = styled.div`
+  background-color: rgb(0, 0, 0);
+  width: 100%;
+  text-align: center;
+  display: inline;
+  @media (min-width: 767px) {
+    padding-bottom: 100px;
+    padding-top: 25px;
+  }
+  @media (max-width: 767px) {
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 100px;
+  }
+`;
+
+export const MainContainer = styled.div`
+  background-color: var(--accent);
+  padding: 24px;
+  border-radius: 24px;
+  border: 4px dashed var(--secondary);
+  box-shadow: rgb(0 0 0 / 70%) 0px 5px 11px 2px;
+  position: relative;
+  top: -120px;
+  min-height: 400px;
+
+  @media (min-width: 767px) {
+    flex: 0 0 50%;
+    height: 400px;    
+  }
+
+  @media (max-width: 767px) {
+    flex: 0 0 100%;
+    height: unset;
+  }
+`;
+
 function App() {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
   const [claimingNft1, setClaimingNft1] = useState(false);
   const [claimingNft2, setClaimingNft2] = useState(false);
-  const [feedback, setFeedback] = useState(`Click on tier to mint your NFT.`);
+  const [feedback, setFeedback] = useState(`Click buy to mint your NFT.`);
   const [mintAmount, setMintAmount] = useState(1);
   const [CONFIG, SET_CONFIG] = useState({
     CONTRACT_ADDRESS: "",
@@ -119,30 +192,44 @@ function App() {
   });
 
   const claimNFTs = async (tier) => {
-
     let cost = 0;
     let gasLimit = 0;
 
     if (tier === 1) {
-      if (await blockchain.smartContract.methods.walletIsInWhiteListTier1(blockchain.account).call()) {
-        cost = await blockchain.smartContract.methods.getWhitelistPrice().call()
+      if (
+        await blockchain.smartContract.methods
+          .walletIsInWhiteListTier1(blockchain.account)
+          .call()
+      ) {
+        cost = await blockchain.smartContract.methods
+          .getWhitelistPrice()
+          .call();
       } else {
-        cost = await blockchain.smartContract.methods.getTier1Price().call()
+        cost = await blockchain.smartContract.methods.getTier1Price().call();
       }
     } else if (tier === 2) {
-      if (await blockchain.smartContract.methods.walletIsInWhiteListTier2(blockchain.account).call()) {
-        cost = await blockchain.smartContract.methods.getWhitelistPrice().call()
+      if (
+        await blockchain.smartContract.methods
+          .walletIsInWhiteListTier2(blockchain.account)
+          .call()
+      ) {
+        cost = await blockchain.smartContract.methods
+          .getWhitelistPrice()
+          .call();
       } else {
-        cost = await blockchain.smartContract.methods.getTier2Price().call()
+        cost = await blockchain.smartContract.methods.getTier2Price().call();
       }
     }
 
     let totalCostWei = String(cost);
-    let userBalance = await blockchain.web3.eth.getBalance(blockchain.account)
+    let userBalance = await blockchain.web3.eth.getBalance(blockchain.account);
 
-    if (blockchain.web3.utils.fromWei(totalCostWei) > blockchain.web3.utils.fromWei(userBalance)) {
-      setFeedback("Insufficient funds")
-      return
+    if (
+      blockchain.web3.utils.fromWei(totalCostWei) >
+      blockchain.web3.utils.fromWei(userBalance)
+    ) {
+      setFeedback("Insufficient funds");
+      return;
     }
 
     console.log("Cost: ", totalCostWei);
@@ -152,98 +239,98 @@ function App() {
       setClaimingNft1(true);
       setClaimingNft2(false);
       await blockchain.smartContract.methods
-      .mintTier1()
-      .estimateGas({
-        from: blockchain.account,
-        value: totalCostWei,
-      })
-      .then((estimatedGas) => {
-        gasLimit = estimatedGas
-      })
-      .catch((error) => {
-        catchError(error)
-        setClaimingNft1(false)
-      })
-
-      if (gasLimit > 0) {
-        blockchain.smartContract.methods
         .mintTier1()
-        .send({
-          gasLimit: String(gasLimit),
-          to: CONFIG.CONTRACT_ADDRESS,
+        .estimateGas({
           from: blockchain.account,
           value: totalCostWei,
         })
-        .then((receipt) => {
-          console.log(receipt);
-          setFeedback(
-            `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
-          );
-          setClaimingNft1(false);
-          dispatch(fetchData(blockchain.account));
+        .then((estimatedGas) => {
+          gasLimit = estimatedGas;
         })
         .catch((error) => {
-          console.log(error);
-          catchError(error)
-          setClaimingNft1(false)
-        })
+          catchError(error);
+          setClaimingNft1(false);
+        });
+
+      if (gasLimit > 0) {
+        blockchain.smartContract.methods
+          .mintTier1()
+          .send({
+            gasLimit: String(gasLimit),
+            to: CONFIG.CONTRACT_ADDRESS,
+            from: blockchain.account,
+            value: totalCostWei,
+          })
+          .then((receipt) => {
+            console.log(receipt);
+            setFeedback(
+              `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
+            );
+            setClaimingNft1(false);
+            dispatch(fetchData(blockchain.account));
+          })
+          .catch((error) => {
+            console.log(error);
+            catchError(error);
+            setClaimingNft1(false);
+          });
       }
     } else if (tier === 2) {
       setClaimingNft1(false);
       setClaimingNft2(true);
       await blockchain.smartContract.methods
-      .mintTier2()
-      .estimateGas({
-        from: blockchain.account,
-        value: totalCostWei,
-      })
-      .then((estimatedGas) => {
-        gasLimit = estimatedGas
-      })
-      .catch((error) => {
-        catchError(error)
-        setClaimingNft2(false)
-      })
-
-      if (gasLimit > 0) {
-        await blockchain.smartContract.methods
         .mintTier2()
-        .send({
-          gasLimit: String(gasLimit),
-          to: CONFIG.CONTRACT_ADDRESS,
+        .estimateGas({
           from: blockchain.account,
           value: totalCostWei,
         })
-        .then((receipt) => {
-          console.log(receipt);
-          setFeedback(
-            `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
-          );
-          setClaimingNft2(false);
-          dispatch(fetchData(blockchain.account));
+        .then((estimatedGas) => {
+          gasLimit = estimatedGas;
         })
         .catch((error) => {
-          console.log(error);
-          catchError(error)
-          setClaimingNft2(false)
-        })
+          catchError(error);
+          setClaimingNft2(false);
+        });
+
+      if (gasLimit > 0) {
+        await blockchain.smartContract.methods
+          .mintTier2()
+          .send({
+            gasLimit: String(gasLimit),
+            to: CONFIG.CONTRACT_ADDRESS,
+            from: blockchain.account,
+            value: totalCostWei,
+          })
+          .then((receipt) => {
+            console.log(receipt);
+            setFeedback(
+              `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
+            );
+            setClaimingNft2(false);
+            dispatch(fetchData(blockchain.account));
+          })
+          .catch((error) => {
+            console.log(error);
+            catchError(error);
+            setClaimingNft2(false);
+          });
       }
     }
   };
 
   const catchError = (error) => {
-    if (error.message.includes('Internal JSON-RPC error.')) {
-      const split = error.message.split('Internal JSON-RPC error.')
-      if (typeof split[1] !== 'undefined') {
-        error = JSON.parse(error.message.split('Internal JSON-RPC error.')[1])
-        setFeedback(error.message)
+    if (error.message.includes("Internal JSON-RPC error.")) {
+      const split = error.message.split("Internal JSON-RPC error.");
+      if (typeof split[1] !== "undefined") {
+        error = JSON.parse(error.message.split("Internal JSON-RPC error.")[1]);
+        setFeedback(error.message);
       }
     } else if (error.message) {
-      setFeedback(error.message)
+      setFeedback(error.message);
     } else {
-      setFeedback('Something went wrong.')
+      setFeedback("Something went wrong.");
     }
-  }
+  };
 
   const decrementMintAmount = () => {
     let newMintAmount = mintAmount - 1;
@@ -270,7 +357,7 @@ function App() {
   const connectContract = async () => {
     await dispatch(contract());
     dispatch(fetchData());
-  }
+  };
 
   const getConfig = async () => {
     const configResponse = await fetch("/config/config.json", {
@@ -283,9 +370,13 @@ function App() {
     SET_CONFIG(config);
   };
 
+  const numberWithCommas = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   useEffect(() => {
     getConfig();
-    connectContract()
+    connectContract();
   }, []);
 
   useEffect(() => {
@@ -294,34 +385,27 @@ function App() {
 
   return (
     <s.Screen>
-      <s.Container style={{
-              textAlign: 'center',
-              display: 'inline',
-              paddingBottom: '100px',
-              backgroundColor: '#000',
-              paddingTop: '25px'
-            }}>
-      <StyledLogo alt={"logo"} src={"/config/images/logo_2.png"} style={{
-              height: '70px',
-              width: '70px',
-              display: 'block',
-              float: 'left'
-            }} />
-      <StyledLogo alt={"logo"} src={"/config/images/logo.png"} />
-      </s.Container>
+      <ContainerHeader>
+        <StyledLogo alt={"logo"} src={"/config/images/logo_2.png"} />
+        <StyledLogoHeader alt={"logo"} src={"/config/images/logo.png"} />
+      </ContainerHeader>
       <s.Container
         flex={1}
         ai={"center"}
-        style={{ padding: 24, backgroundColor: "var(--primary)" }}
+        style={{
+          padding: 24,
+          paddingTop: 20,
+          backgroundColor: "var(--primary)",
+        }}
         image={CONFIG.SHOW_BACKGROUND ? "/config/images/bg.png" : null}
       >
         <s.SpacerSmall />
-        <ResponsiveWrapper flex={1} style={{ padding: 24 }} test>
-          <s.Container flex={1} jc={"center"} ai={"center"}>
-            {/* <StyledImg alt={"example"} src={"/config/images/example.gif"} /> */}
-          </s.Container>
-          <s.SpacerLarge />
-          <s.Container
+        <ResponsiveWrapper
+          flex={1}
+          style={{ padding: 24, justifyContent: "center" }}
+          test
+        >
+          <MainContainer
             flex={2}
             jc={"center"}
             ai={"center"}
@@ -331,9 +415,9 @@ function App() {
               borderRadius: 24,
               border: "4px dashed var(--secondary)",
               boxShadow: "0px 5px 11px 2px rgba(0,0,0,0.7)",
-              position: 'relative',
-              top: '-120px',
-              height: '400px'
+              position: "relative",
+              top: "-120px",
+              minHeight: "400px",
             }}
           >
             <s.TextTitle
@@ -344,7 +428,7 @@ function App() {
                 color: "var(--accent-text)",
               }}
             >
-              {data.totalSupply} / {CONFIG.MAX_SUPPLY}
+              {data.totalSupply} / {numberWithCommas(CONFIG.MAX_SUPPLY)}
             </s.TextTitle>
             <s.TextDescription
               style={{
@@ -394,8 +478,9 @@ function App() {
                         dispatch(connect());
                         getData();
                       }}
+                      disabled={blockchain.loading}
                     >
-                      CONNECT
+                      {"CONNECT"}
                     </StyledButton>
                     {blockchain.errorMsg !== "" ? (
                       <>
@@ -415,60 +500,45 @@ function App() {
                   <>
                     <s.TextDescription
                       style={{
+                        fontSize: "21px",
+                        fontWeight: "500",
                         textAlign: "center",
-                        color: "var(--accent-text)",
+                      }}
+                    >
+                      1 NCC costs 100 Matic.
+                    </s.TextDescription>
+
+                    <s.TextDescription
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "400",
+                        marginTop: "10px",
+                        textAlign: "center",
+                      }}
+                    >
+                      Excluding gas fees.
+                    </s.TextDescription>
+
+                    <s.TextDescription
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "600",
+                        marginTop: "10px",
+                        textAlign: "center",
                       }}
                     >
                       {feedback}
                     </s.TextDescription>
                     <s.SpacerMedium />
-                    {/* <s.Container ai={"center"} jc={"center"} fd={"row"}>
-                      <StyledRoundButton
-                        style={{ lineHeight: 0.4 }}
-                        disabled={claimingNft ? 1 : 0}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          decrementMintAmount();
-                        }}
-                      >
-                        -
-                      </StyledRoundButton>
-                      <s.SpacerMedium />
-                      <s.TextDescription
-                        style={{
-                          textAlign: "center",
-                          color: "var(--accent-text)",
-                        }}
-                      >
-                        {mintAmount}
-                      </s.TextDescription>
-                      <s.SpacerMedium />
-                      <StyledRoundButton
-                        disabled={claimingNft ? 1 : 0}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          incrementMintAmount();
-                        }}
-                      >
-                        +
-                      </StyledRoundButton>
-                    </s.Container> */}
+
                     <s.SpacerSmall />
-                    <s.Container ai={"center"} jc={"center"} fd={"row"}>
-                    <s.TextDescription style={{
-                        textAlign: "left",
-                        width: "20%",
-                      }}>
-                    {blockchain.tier1 ? (blockchain.whitelistPrice > 0 ? blockchain.whitelistPrice + ' ' + CONFIG.NETWORK.SYMBOL : 'FREE') : blockchain.tier1Price + ' ' + CONFIG.NETWORK.SYMBOL}
-                    </s.TextDescription>
-                    <s.TextDescription style={{
-                        textAlign: "left",
-                        width: "20%",
-                      }}>
-                    {blockchain.tier2 ? (blockchain.whitelistPrice > 0 ? blockchain.whitelistPrice + ' ' + CONFIG.NETWORK.SYMBOL : 'FREE') : blockchain.tier2Price + ' ' + CONFIG.NETWORK.SYMBOL}
-                    </s.TextDescription>
-                    </s.Container>
-                    <s.Container ai={"center"} jc={"center"} fd={"row"}>
+                    <s.Container
+                      flex
+                      ai={"center"}
+                      jc={"center"}
+                      fd={"row"}
+                      mfd={"column"}
+                    >
                       <StyledButton
                         disabled={claimingNft1 || claimingNft2 ? 1 : 0}
                         onClick={(e) => {
@@ -477,7 +547,7 @@ function App() {
                           getData();
                         }}
                       >
-                        {claimingNft1 ? "Minting..." : "Tier 1"}
+                        {claimingNft1 ? "Minting..." : "TEAR 1"}
                       </StyledButton>
                       <StyledButton
                         disabled={claimingNft1 || claimingNft2 ? 1 : 0}
@@ -486,8 +556,9 @@ function App() {
                           claimNFTs(2);
                           getData();
                         }}
+                        mmt={"20px"}
                       >
-                        {claimingNft2 ? "Minting..." : "Tier 2"}
+                        {claimingNft2 ? "Minting..." : "TEAR 2"}
                       </StyledButton>
                     </s.Container>
                   </>
@@ -495,15 +566,7 @@ function App() {
               </>
             )}
             <s.SpacerMedium />
-          </s.Container>
-          <s.SpacerLarge />
-          <s.Container flex={1} jc={"center"} ai={"center"}>
-            {/* <StyledImg
-              alt={"example"}
-              src={"/config/images/example.gif"}
-              style={{ transform: "scaleX(-1)" }}
-            /> */}
-          </s.Container>
+          </MainContainer>
         </ResponsiveWrapper>
         <s.SpacerMedium />
         {/* <s.Container jc={"center"} ai={"center"} style={{ width: "70%" }}>
