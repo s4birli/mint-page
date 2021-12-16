@@ -264,7 +264,7 @@ function App() {
           .then((receipt) => {
             console.log(receipt);
             setFeedback(
-              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it :rocket:`
+              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it 🚀`
             );
             setClaimingNft1(false);
             dispatch(fetchData(blockchain.account));
@@ -304,7 +304,7 @@ function App() {
           .then((receipt) => {
             console.log(receipt);
             setFeedback(
-              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it :rocket:`
+              `Success! Your ${CONFIG.NFT_NAME} is officially minted. Go to OpenSea.io to view it 🚀`
             );
             setClaimingNft2(false);
             dispatch(fetchData(blockchain.account));
