@@ -2,9 +2,9 @@
   "CONTRACT_ADDRESS": "0x756345ecD597CEBFD95e62677e18b0A84333b786",
   "SCAN_LINK": "https://polygonscan.com/address/0x756345ecD597CEBFD95e62677e18b0A84333b786",
   "NETWORK": {
-    "NAME": "Polygon Mainnet",
+    "NAME": "Polygon Testnet",
     "SYMBOL": "MATIC",
-    "ID": 137
+    "ID": 80001
   },
   "NFT_NAME": "MetaBadges",
   "SYMBOL": "OSIS",
